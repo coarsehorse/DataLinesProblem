@@ -1,41 +1,45 @@
 import domain.DataLine;
-import util.InputReader;
-
 import javafx.util.Pair;
+import validator.DataLineValidator;
+
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+/**
+ * Application entry point.
+ */
 public class DataLinesProblem {
 
+    /**
+     * Solution to the problem.
+     *
+     * @param args application arguments
+     */
     public static void main(String[] args) {
-        try {
-            List<DataLine> inputLines = InputReader.readInputFile("resources/input.txt");
-            HashMap<DataLine, List<DataLine>> queryDLinesMap = inputLines.stream() // Group each query line("D") with
-                    .collect(HashMap::new, (m, e) -> {                             // corresponding data lines("C")
-                        if (!e.getType().equalsIgnoreCase("d")) {
-                            List<DataLine> prev = m.getOrDefault(null, new ArrayList<>());
+        List<DataLine> buffer = new ArrayList<>();
 
-                            if (prev.isEmpty()) {
-                                prev.add(e);
-                                m.put(null, prev);
-                            } else
-                                prev.add(e); // put is redundant, prev is a link
-                        } else {
-                            m.put(e, new ArrayList<>(m.getOrDefault(null, new ArrayList<>())));
-                        }
-                    }, (m1, m2) -> m1.putAll(m2));
+        try (Stream<String> fileStream = Files.lines(Paths.get("resources/input2.txt"))) {
+            fileStream
+                    .filter(DataLineValidator.getInstance()::validate)
+                    .map(DataLine::new)
+                    .collect(ArrayList<Pair<DataLine, List<DataLine>>>::new, // group each query(D) with its lines(C)
+                            (l, e) -> {
+                                if (!e.getType().equalsIgnoreCase("d"))
+                                    buffer.add(e);
+                                else
+                                    l.add(new Pair<>(e, new ArrayList<>(buffer))); // copy current buffer state
+                            }, ArrayList::addAll)
+                    .stream()
+                    .map(pair -> { // process stream of (query, lines) and transform to the stream of results
+                        DataLine query = pair.getKey();
+                        List<DataLine> dLines = pair.getValue();
 
-            queryDLinesMap.remove(null); // remove service pair
-
-            Map<DataLine, String> queryResultMap = queryDLinesMap.entrySet().stream() // process each query and
-                    .map(entry -> {                                                   // make query => result map
-                        DataLine query = entry.getKey();
-                        List<DataLine> dLines = entry.getValue();
                         List<DataLine> filteredLines = dLines.stream() // filter out dLines
                                 .filter(dLine -> { // service filter
                                     if (query.getServiceNumber() == 0)
@@ -80,16 +84,10 @@ public class DataLinesProblem {
                                 .map(DataLine::getTime)
                                 .reduce(0, (acc, n) -> acc + n);
                         int filteredQuantity = filteredLines.size();
-                        String result = timeSum == 0 ? "-" : String.valueOf(timeSum / filteredQuantity);
 
-                        return new Pair<>(query, result);
+                        return timeSum == 0 ? "-" : String.valueOf(timeSum / filteredQuantity); // avgTime as result
                     })
-                    .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
-
-            // Restore queries order before printing result
-            inputLines.stream()
-                    .filter(x -> x.getType().equalsIgnoreCase("d"))
-                    .forEach(x -> System.out.println(queryResultMap.get(x)));
+                    .forEach(System.out::println);
         } catch (IOException e) {
             e.printStackTrace();
         }

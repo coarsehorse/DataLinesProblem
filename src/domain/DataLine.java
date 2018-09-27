@@ -4,9 +4,9 @@ import validator.DataLineValidator;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.Objects;
 
 /**
  * Represents one data row from the input file.
@@ -31,19 +31,18 @@ public class DataLine implements Serializable {
     }
 
     /**
-     * Constructs DataLine object by parsing input string.
+     * Constructs the DataLine object by parsing input string.
      *
      * @param line input string
-     * @throws Exception if input string is not valid
      */
-    public DataLine(String line) throws Exception {
+    public DataLine(String line) {
         if (!DataLineValidator.getInstance().validate(line)) {
             StringBuilder messBuilder = new StringBuilder();
             messBuilder.append("DataLine input validation error! Input line: \"");
             messBuilder.append(line);
             messBuilder.append("\"");
 
-            throw new Exception(messBuilder.toString());
+            throw new RuntimeException(messBuilder.toString());
         }
 
         String[] inpParts = line.split(" ");
@@ -121,12 +120,10 @@ public class DataLine implements Serializable {
             if (dateParts.length == 2) {
                 responseDate = LocalDate.parse(dateParts[0], formatter);
                 responseDate2 = LocalDate.parse(dateParts[1], formatter);
-            }
-            else if (dateParts.length == 1) {
+            } else if (dateParts.length == 1) {
                 responseDate = LocalDate.parse(dateParts[0], formatter);
                 responseDate2 = responseDate;
             }
-
             time = 0;
         }
     }
@@ -185,5 +182,28 @@ public class DataLine implements Serializable {
                 ", responseDate2=" + responseDate2 +
                 ", time=" + time +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DataLine)) return false;
+        DataLine dataLine = (DataLine) o;
+        return Objects.equals(type, dataLine.type) &&
+                Objects.equals(serviceNumber, dataLine.serviceNumber) &&
+                Objects.equals(serviceVariation, dataLine.serviceVariation) &&
+                Objects.equals(questionType, dataLine.questionType) &&
+                Objects.equals(questionCategory, dataLine.questionCategory) &&
+                Objects.equals(questionSubCategory, dataLine.questionSubCategory) &&
+                Objects.equals(responseType, dataLine.responseType) &&
+                Objects.equals(responseDate, dataLine.responseDate) &&
+                Objects.equals(responseDate2, dataLine.responseDate2) &&
+                Objects.equals(time, dataLine.time);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, serviceNumber, serviceVariation, questionType, questionCategory,
+                questionSubCategory, responseType, responseDate, responseDate2, time);
     }
 }
