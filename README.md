@@ -38,6 +38,7 @@ defined before query line are counted. It print out “-” if output is not def
 **Example**
 
 Input:
+```
 7
 C 1.1 8.15.1 P 15.10.2012 83
 C 1 10.1 P 01.12.2012 65
@@ -46,11 +47,14 @@ D 1.1 8 P 01.01.2012-01.12.2012
 C 3 10.2 N 02.10.2012 100
 D 1 * P 8.10.2012-20.11.2012
 D 3 10 P 01.12.2012
+```
+
 Output:
+```
 83
 100
 -
-
+```
 **Explanation**
 
 1.query at line 5, is valid only for 1. data line, because others has different question type. First
