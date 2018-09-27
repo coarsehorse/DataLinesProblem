@@ -1,5 +1,6 @@
+package util;
+
 import domain.DataLine;
-import util.InputReader;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -7,10 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ProblemSolver {
-    public static void main(String[] args) {
+public class ProblemSolverV1 {
+
+    public static String solve(String inputFilePath) {
+        StringBuilder resultBuilder = new StringBuilder();
+
         try {
-            List<DataLine> lines = InputReader.readInputFile("resources/input.txt");
+            List<DataLine> lines = InputReader.readInputFile(inputFilePath);
             List<DataLine> processedTimeLines = new ArrayList<>();
 
             for (DataLine line : lines) {
@@ -49,7 +53,6 @@ public class ProblemSolver {
                             filtered = filtered.stream()
                                     .filter(x -> x.getQuestionSubCategory().equals(line.getQuestionSubCategory()))
                                     .collect(Collectors.toList());
-
                     }
                 }
 
@@ -65,8 +68,6 @@ public class ProblemSolver {
                         })
                         .collect(Collectors.toList());
 
-                //filtered.forEach(System.out::println);
-
                 if (filtered.size() > 0) {
                     int timeSum = filtered.stream()
                             .map(DataLine::getTime)
@@ -74,13 +75,18 @@ public class ProblemSolver {
 
                     int avgTime = timeSum / filtered.size();
 
-                    System.out.println("Result: " + avgTime);
+                    //System.out.println("Result: " + avgTime);
+                    resultBuilder.append(avgTime);
+                    resultBuilder.append("\n");
                 } else {
-                    System.out.println("-");
+                    //System.out.println("-");
+                    resultBuilder.append("-\n");
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return resultBuilder.toString();
     }
 }
