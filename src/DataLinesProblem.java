@@ -24,7 +24,7 @@ public class DataLinesProblem {
     public static void main(String[] args) {
         List<DataLine> buffer = new ArrayList<>();
 
-        try (Stream<String> fileStream = Files.lines(Paths.get("resources/input2.txt"))) {
+        try (Stream<String> fileStream = Files.lines(Paths.get("resources/input.txt"))) {
             fileStream
                     .filter(DataLineValidator.getInstance()::validate)
                     .map(DataLine::new)
