@@ -26,8 +26,8 @@ Similarly query line:
 ```D service_id[.variation_id] question_type_id[.category_id.[sub-category_id]] P/N date_from[-date_to]```
 
 Represent query, it print out average waiting time of all records matching specific criterias.
-service_id and question_type can have special value “*”, it means query match all
-services/question types. In case of value “*”, no service variation nor service
+service_id and question_type can have special value “\*”, it means query match all
+services/question types. In case of value “\*”, no service variation nor service
 category/sub-category can be specified.
 
 **Output**
